@@ -50,6 +50,9 @@ public class DFAssinaturaDigital implements DFLog {
             throw new IllegalStateException("Nao foi encontrada a assinatura do XML.");
         }
 
+        final String providerName = System.getProperty("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
+        final XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM", (Provider) Class.forName(providerName).getDeclaredConstructor().newInstance());
+
         final DOMValidateContext validateContext = new DOMValidateContext(new DFKeySelector(), nodeList.item(0));
         for (final String tag : DFAssinaturaDigital.ELEMENTOS_ASSINAVEIS) {
             final NodeList elements = document.getElementsByTagName(tag);
@@ -58,10 +61,6 @@ public class DFAssinaturaDigital implements DFLog {
             }
         }
 
-//        final String providerName = System.getProperty("jsr105Provider", "org.jcp.xml.dsig.internal.dom.XMLDSigRI");
-//        final XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM", (Provider) Class.forName(providerName).getDeclaredConstructor().newInstance());
-
-        final XMLSignatureFactory signatureFactory = XMLSignatureFactory.getInstance("DOM", new XMLDSigRI());
         return signatureFactory.unmarshalXMLSignature(validateContext).validate(validateContext);
     }
 
